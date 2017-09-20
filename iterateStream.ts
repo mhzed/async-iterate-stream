@@ -1,5 +1,5 @@
 import {Readable, Writable} from 'stream';
-import {P, makeP, asyncForever} from "./src/util";
+import {P, makeP, asyncForever, NextQueue} from "./src/util";
 
 /**
  * Usage:
@@ -27,27 +27,7 @@ export const iterateStream = (src: Readable, objectMode: boolean) : Iterable<any
     }, (err) => {
     })
   });
-
-  class NextQueue {
-    private cbqueue = [];
-    private valuequeue = [];
-
-    save(cb, value) {
-      this.cbqueue.push(cb);
-      this.valuequeue.push(value);
-    }
-    hasValues() {
-      return this.valuequeue.length > 0;
-    }
-    stepValue() {
-      return this.valuequeue.shift();
-    }
-    stepCb() {
-      if (this.cbqueue.length>0) {
-        this.cbqueue.shift()();
-      }
-    }
-  }
+  
   let queue = new NextQueue();
   src.pipe(new Writable({objectMode, write: (o, enc, cb)=>{
     queue.save(cb, o);    // save stream state only, let async while loop determine when to advance stream

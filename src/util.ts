@@ -14,7 +14,26 @@ export const makeP = () : P => {
   });
   return {promise, resolver, rejecter};
 }
+export class NextQueue {
+  private cbqueue = [];
+  private valuequeue = [];
 
+  save(cb, value) {
+    this.cbqueue.push(cb);
+    this.valuequeue.push(value);
+  }
+  hasValues() {
+    return this.valuequeue.length > 0;
+  }
+  stepValue() {
+    return this.valuequeue.shift();
+  }
+  stepCb() {
+    if (this.cbqueue.length>0) {
+      this.cbqueue.shift()();
+    }
+  }
+}
 export {asyncForever};
 // // same as async.forever
 // export const asyncForever = (cb : ( next: (err?:any)=>void )=>void, done: (err?:any)=>void ) => {
