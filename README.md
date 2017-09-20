@@ -10,7 +10,7 @@ strictly non-leaky.  See examples below.
 
 ### Usage
 
-There are two ways to use this.  The sipmle way is the bleeding edge way (https://github.com/tc39/proposal-async-iteration):
+There are two ways to use this.  The simple way is the bleeding edge way (https://github.com/tc39/proposal-async-iteration):
 
     import {asyncIterateStream} from "async-iterate-stream/asyncIterateStream";
 

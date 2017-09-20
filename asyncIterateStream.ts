@@ -26,41 +26,58 @@ import {P, makeP, asyncForever} from "./src/util";
  * @returns {AsyncIterableIterator<any>}
  */
 export async function* asyncIterateStream(src: Readable, objectMode: boolean) : AsyncIterableIterator<any> {
-  let arrival : P = null;
+  let iterator : P = null;
   let end : boolean = false;
-
-  const callUponArrival = (cb) => {    // call cb until arrival is not null
-    if (arrival!=null) {
-      cb();
-    } else { // async wait for p is not null, then call next
-      asyncForever((next) => {
-        if (arrival != null) {
-          cb();
-          next('stop');
-        } else setTimeout(next, 5);
-      }, (err) => {
-      })
-    }
-  }
+  
   src.on('error', (err)=>{
-    callUponArrival(()=>{
-      arrival.rejecter(err);
-      end = true;
+    asyncForever((next) => {
+      if (iterator != null && !end) {
+        iterator.rejecter(err);
+        end = true;
+        next('stop');
+      } else setTimeout(next, 1);
+    }, (err) => {
     })
   });
-  let throttleStream = src.pipe(new Writable({objectMode, write: (o, enc, cb)=>{
-    callUponArrival(()=>{
-      arrival.resolver(o);
-      arrival = null;
-      cb();
-    });
+  
+  class NextQueue {
+    private cbqueue = [];
+    private valuequeue = [];
+    
+    save(cb, value) {
+      this.cbqueue.push(cb);
+      this.valuequeue.push(value);
+    }
+    hasValues() { 
+      return this.valuequeue.length > 0;
+    }
+    stepValue() {
+      return this.valuequeue.shift();
+    }
+    stepCb() {
+      if (this.cbqueue.length>0) {
+        this.cbqueue.shift()();
+      }
+    }
+  }
+  let queue = new NextQueue();
+  src.pipe(new Writable({objectMode, write: (o, enc, cb)=>{
+    queue.save(cb, o);    // save stream state only, let async while loop determine when to advance stream
+    if (iterator != null) {
+      iterator.resolver();
+    }
   }})).on('finish', ()=>{
     end = true;
-    callUponArrival(()=>arrival.resolver());  // make sure loop terminates
+    if (iterator != null) {
+      iterator.resolver();
+    }
   });
-  while (!end) {
-    arrival = makeP();
-    let value = await arrival.promise;
-    if (value !== undefined) yield value;
+  while (!end) {        // order is very important
+    iterator = makeP();
+    queue.stepCb();     // advance stream
+    await iterator.promise; // wait for stream to get next element
+    iterator = null;
+    if (queue.hasValues()) yield queue.stepValue();
   }
+  while (queue.hasValues()) yield queue.stepValue();
 }
