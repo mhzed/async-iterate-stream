@@ -31,7 +31,7 @@ export async function* asyncIterateStream(src: Readable, objectMode: boolean) : 
   
   src.on('error', (err)=>{
     asyncForever((next) => {
-      if (iterator != null && !end) {
+      if (iterator != null) {
         iterator.rejecter(err);
         end = true;
         next('stop');

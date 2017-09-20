@@ -19,7 +19,7 @@ export const iterateStream = (src: Readable, objectMode: boolean) : Iterable<any
 
   src.on('error', (err)=>{
     asyncForever((next) => {
-      if (iterator != null && !end) {
+      if (iterator != null) {
         iterator.rejecter(err);
         end = true;
         next('stop');
