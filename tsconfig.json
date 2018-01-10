@@ -8,6 +8,7 @@
       "es6",
       "esnext.asynciterable"
     ],
+    "noUnusedLocals": true,
     "typeRoots": ["node_modules/@types"],
     "inlineSourceMap" : true
     }

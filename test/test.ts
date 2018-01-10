@@ -4,12 +4,6 @@ import {iterateStream, asyncIterateStream} from "..";
 import {Readable} from 'stream';
 import * as fs from 'fs';
 
-const sleep = (ms: number) => {
-  return new Promise((resolve, reject)=>{
-    setTimeout(resolve, ms);
-  })
-}
-
 class DelayedSrc extends Readable {
   constructor(n: number) {
     super({objectMode: true});
@@ -100,4 +94,5 @@ exports.testIterateStream = (test: nodeunit.Test) => {
     }
     test.ok(/iterateStream/.test(content), "read this file");
 
-  })().catch(test.ifError).then(test.done);
+  })().catch(test.ifError).then(test.done)}
+

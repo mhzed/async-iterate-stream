@@ -1,5 +1,5 @@
-*.map
-*.coffee
+package-lock.json
+yarn.lock
 test/
 node_modules/
 bower_components/

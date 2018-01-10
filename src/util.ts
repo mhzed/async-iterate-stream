@@ -1,4 +1,3 @@
-import {Writable, WritableOptions} from 'stream';
 import * as asyncForever from 'async.forever';
 
 export interface P {
