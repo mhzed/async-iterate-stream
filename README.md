@@ -1,12 +1,8 @@
 async-iterate-stream
 --------
 
-Turns a nodejs stream.Readable into an Iterable or AsyncIterable so that it can be easily iterated in an async
-function.
-
-A quick npm search returns a lot of similar modules.  But the few I've tried are "leaky":   If the Readable source 
-emits 'data' events faster than the iteration in the async function, then events are lost randomly.  This module is 
-strictly non-leaky.  See examples below.
+Turns a nodejs stream.Readable into an Iterable or AsyncIterable so that it can be iterated in an async
+function.  Stream back-pressure is maintained duration iteration: the readable source's data events are never dropped and back-pressure is applied to stream if iteration can not keep up.
 
 ### Usage
 
