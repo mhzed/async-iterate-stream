@@ -1,6 +1,6 @@
 {
   "name": "async-iterate-stream",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "async-iterate-stream --------",
   "main": "index.js",
   "scripts": {
